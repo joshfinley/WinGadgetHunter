@@ -164,7 +164,7 @@ void print_match(const std::vector<uint8_t>& data, size_t start_idx, size_t matc
 int main(int argc, char* argv[]) {
     // Check for proper usage
     if (argc < 2) {
-        std::cerr << "Usage: tool.exe <pattern> [-i <path>]\n";
+        std::cerr << "Usage: WinGadgetHunter.exe <pattern> [-i <path>]\n";
         return 1;
     }
 
