@@ -4,10 +4,10 @@ WinGadgetHunter is a simple pattern matching tool I use to search for ROP (Retur
 
 ## Features
 
-    Searches for user-defined byte patterns within DLL files.
-    Supports wildcards for more flexible pattern matching.
-    Can scan all DLLs in a specified directory or a single DLL.
-    Color-coded console output for easy interpretation.
+- Searches for user-defined byte patterns within DLL files.
+- Supports wildcards for more flexible pattern matching.
+- Can scan all DLLs in a specified directory or a single DLL.
+- Color-coded console output for easy interpretation.
 
 ## Dependencies
 
