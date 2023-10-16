@@ -162,60 +162,79 @@ void print_match(const std::vector<uint8_t>& data, size_t start_idx, size_t matc
 }
 
 int main(int argc, char* argv[]) {
-    // Check for proper usage
+    // Check for the proper number of command-line arguments.
+    // Expect at least one argument for the search pattern.
     if (argc < 2) {
         std::cerr << "Usage: WinGadgetHunter.exe <pattern> [-i <path>]\n";
         return 1;
     }
 
     try {
-        // Parse the search pattern
+        // Parse the search pattern from the first command-line argument.
         std::string pattern_str = argv[1];
         std::vector<OptByte> pattern = parse_pattern_string(pattern_str);
 
-        // Define the default path or get it from arguments
+        // Define the default directory to search for DLLs. 
+        // Override with a user-specified path if provided.
         std::filesystem::path path_to_check = "C:\\Windows\\System32";  // default path
         if (argc >= 4 && std::string(argv[2]) == "-i") {
             path_to_check = argv[3];
         }
 
-        // Check if is a file or directory and either loop over files and match
-        // or just match against the single file
+        // Determine whether the given path is a directory.
+        // If it is, loop through and check each DLL file in that directory.
         if (std::filesystem::is_directory(path_to_check)) {
             for (const auto& entry : std::filesystem::directory_iterator(path_to_check)) {
                 if (entry.path().extension() == ".dll") {
                     HMODULE hModule = LoadLibraryExA(entry.path().string().c_str(), nullptr, LOAD_LIBRARY_AS_DATAFILE);
                     if (hModule) {
+                        // Get the .text (code) section of the DLL.
                         if (auto code = get_code_section(hModule); code) {
+                            // Copy the code section data into a vector.
                             std::vector<uint8_t> dll_data(code->base_address, code->base_address + code->size);
+
+                            // Search for pattern matches in the code section.
                             auto matches = find_all_matches(dll_data, pattern);
+
+                            // Print each match found.
                             for (auto match : matches) {
                                 print_match(dll_data, match, pattern.size(), entry.path());
                             }
                         }
+                        // Unload the DLL from memory.
                         FreeLibrary(hModule);
                     }
                 }
             }
         }
+        // If the path points to a single DLL file, just check that file.
         else if (std::filesystem::is_regular_file(path_to_check) && path_to_check.extension() == ".dll") {
             HMODULE hModule = LoadLibraryExA(path_to_check.string().c_str(), nullptr, LOAD_LIBRARY_AS_DATAFILE);
             if (hModule) {
+                // Get the .text (code) section of the DLL.
                 if (auto code = get_code_section(hModule); code) {
+                    // Copy the code section data into a vector.
                     std::vector<uint8_t> dll_data(code->base_address, code->base_address + code->size);
+
+                    // Search for pattern matches in the code section.
                     auto matches = find_all_matches(dll_data, pattern);
+
+                    // Print each match found.
                     for (auto match : matches) {
                         print_match(dll_data, match, pattern.size(), path_to_check);
                     }
                 }
+                // Unload the DLL from memory.
                 FreeLibrary(hModule);
             }
         }
         else {
+            // Print an error message if the path is neither a directory nor a DLL file.
             std::cerr << "Invalid path specified. Must be a DLL or directory containing DLLs.\n";
         }
     }
     catch (const std::exception& e) {
+        // Handle any exceptions that might occur, and print the error message.
         std::cerr << "Error: " << e.what() << '\n';
         return 1;
     }
