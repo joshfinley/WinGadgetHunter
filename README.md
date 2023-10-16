@@ -9,17 +9,9 @@ WinGadgetHunter is a simple pattern matching tool I use to search for ROP (Retur
 - Can scan all DLLs in a specified directory or a single DLL.
 - Color-coded console output for easy interpretation.
 
-## Dependencies
+## Dependencies & Building
 
-The program is written in C++ and makes use of the following libraries:
-
-    <Windows.h>: Windows API for loading DLLs and obtaining code sections.
-    <filesystem>: For file and directory operations.
-    <iostream>, <iomanip>, <sstream>, <string>: For input-output operations and string manipulation.
-
-## Building
-
-This project targets MSVC C++17.
+The program is written in MSVC C++17 and relies on Windows.
 
 ## Usage
 
@@ -53,4 +45,4 @@ The tool will print out each match, showing the DLL name, the offset of the matc
 
 ## Contributing
 
-Just use Yara instead
+Just use Yara instead.
